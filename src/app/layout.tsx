@@ -1,3 +1,6 @@
+import { AppSidebar } from '@/components/AppSidebar';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -23,8 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <SidebarProvider>
+            <AppSidebar />
+            <main className="w-full max-w-[calc(100vw-var(--sidebar-width))]">{children}</main>
+          </SidebarProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
