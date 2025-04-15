@@ -1,5 +1,5 @@
+import { TextGenerator } from '@/components/text-generation/TextGenerator';
 import { ModeToggle } from '@/components/ModeToggle';
-import Tiptap from '@/components/TipTap';
 
 export default function Home() {
   return (
@@ -7,9 +7,9 @@ export default function Home() {
       <div className="flex justify-end">
         <ModeToggle />
       </div>
-      <div className="flex flex-col h-screen p-8 gap-2">
-        <h1 className="text-2xl font-bold">Joo Hee Paige Kim Darfter UI</h1>
-        <Tiptap />
+      <div className="flex flex-col h-screen px-8 gap-4">
+        <h1 className="text-2xl font-bold">Joo Hee Paige Kim Drafter UI</h1>
+        <TextGenerator />
       </div>
     </>
   );

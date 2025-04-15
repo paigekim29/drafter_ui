@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { Button } from './ui/button';
 
 const items = [
   {
@@ -41,8 +42,8 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="flex justify-center">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <div className="flex items-center justify-center bg-violet-500 py-2 rounded-md">P</div>
+          <SidebarMenuItem className="flex items-center justify-center">
+            <Button className="bg-indigo-500 py-2 rounded-md">P</Button>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
