@@ -27,9 +27,12 @@ pnpm run dev
 ## Project Structure
 
 ```
-drafter_ui/
+drafter_ui/src
 ├── app/          # Next.js app router
 ├── components/   # Reusable components
-├── public/       # Static files
-└── styles/       # Style files
+├── constants/   # Constants and configuration values
+├── hooks/       # Custom React hooks
+├── lib/         # Core library code and utilities
+├── types/       # TypeScript type definitions
+├── utils/       # Helper functions and utilities
 ```
