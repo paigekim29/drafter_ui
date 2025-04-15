@@ -1,12 +1,20 @@
 'use client';
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 
-const Tiptap = () => {
+interface TipTapProps {
+  setContent: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const Tiptap = ({ setContent }: TipTapProps) => {
   const editor = useEditor({
-    extensions: [StarterKit, Placeholder.configure({ placeholder: 'Please write your text here.' })],
+    extensions: [StarterKit, Placeholder.configure({ placeholder: '다듬고 싶은 글이나 초안을 입력해주세요' })],
+    onUpdate({ editor }) {
+      setContent(editor.getText());
+    },
+    immediatelyRender: false,
   });
 
   return <EditorContent editor={editor} />;

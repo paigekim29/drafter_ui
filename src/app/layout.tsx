@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 const geistSans = Geist({
@@ -32,6 +33,7 @@ export default function RootLayout({
           <SidebarProvider>
             <AppSidebar />
             <main className="w-full max-w-[calc(100vw-var(--sidebar-width))]">{children}</main>
+            <Toaster />
           </SidebarProvider>
         </ThemeProvider>
       </body>

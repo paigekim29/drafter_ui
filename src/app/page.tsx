@@ -7,7 +7,7 @@ export default function Home() {
       <div className="flex justify-end">
         <ModeToggle />
       </div>
-      <div className="flex flex-col h-screen px-8 gap-4">
+      <div className="flex flex-col px-8 gap-4">
         <h1 className="text-2xl font-bold">Joo Hee Paige Kim Drafter UI</h1>
         <TextGenerator />
       </div>

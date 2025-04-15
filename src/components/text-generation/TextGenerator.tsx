@@ -1,75 +1,138 @@
 'use client';
 
-import Tiptap from '@/components/TipTap';
+import SidePanel from '@/components/panel/SidePanel';
+import PromptController from '@/components/text-generation/PromptController';
+import PromptHistory from '@/components/text-generation/PromptHistory';
+import PromptStatus from '@/components/text-generation/PromptStatus';
 import DUMMY_RESPONSES from '@/constants/dummy';
-import { PromptResult } from '@/types';
+import { PromptResult, RefineSettings } from '@/types';
+import dynamic from 'next/dynamic';
 import { useCallback, useState } from 'react';
-import PromptController from './PromptController';
-import PromptHistory from './PromptHistory';
-import PromptStatus from './PromptStatus';
+import { toast } from 'sonner';
+
+const DynamicTipTap = dynamic(() => import('@/components/TipTap'), {
+  loading: () => <div className="h-6">Loading...</div>,
+  ssr: false,
+});
 
 export function TextGenerator() {
-  const [isInputVisible, setIsInputVisible] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [content, setContent] = useState('');
+  const [results, setResults] = useState<PromptResult[]>([]);
   const [currentPrompt, setCurrentPrompt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<PromptResult[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isInputVisible, setIsInputVisible] = useState(false);
+  const [isPanelActive, setIsPanelActive] = useState(false);
 
-  const showInput = useCallback(() => {
-    setError(null);
-    setIsInputVisible(true);
-  }, []);
-
-  const hideInput = useCallback(() => {
-    setError(null);
-    setIsInputVisible(false);
-  }, []);
-
-  const generateText = async (prompt: string): Promise<string> => {
+  const generateText = useCallback(async (prompt: string): Promise<string> => {
+    console.log('prompt', prompt);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return DUMMY_RESPONSES[Math.floor(Math.random() * DUMMY_RESPONSES.length)];
+  }, []);
+
+  const showInput = () => {
+    setError(null);
+    setIsInputVisible(true);
   };
 
-  const handlePromptSubmit = useCallback(async (prompt: string) => {
-    if (!prompt.trim()) return;
+  const hideInput = () => {
+    setError(null);
+    setIsInputVisible(false);
+  };
 
+  const startGenerating = (prompt: string) => {
     setIsGenerating(true);
     setCurrentPrompt(prompt);
     setError(null);
+  };
 
-    try {
-      const response = await generateText(prompt);
+  const handlePromptSubmit = useCallback(
+    async (prompt: string) => {
+      if (!prompt.trim()) return;
 
-      const newResult: PromptResult = {
-        id: Date.now().toString(),
-        prompt,
-        response,
-        timestamp: new Date(),
-      };
+      try {
+        startGenerating(prompt);
+        const response = await generateText(prompt);
 
-      setResults((prev) => [newResult, ...prev]);
-    } catch (err) {
-      console.error('Text generation failed:', err);
-      setError(err instanceof Error ? err.message : 'Text generation failed. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
+        const newResult: PromptResult = {
+          id: Date.now().toString(),
+          prompt,
+          response,
+          timestamp: new Date(),
+        };
+
+        setResults((prev) => [newResult, ...prev]);
+      } catch (err) {
+        console.error('Text generation failed:', err);
+        setError(err instanceof Error ? err.message : 'Text generation failed. Please try again.');
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [generateText],
+  );
+
+  const refineText = useCallback(
+    async (settings?: RefineSettings) => {
+      if (content.trim() === '' && results.length === 0) {
+        return toast('Please generate or enter some text first.');
+      }
+
+      const refinementCount = results.filter((r) => r.prompt.includes('Refine #')).length;
+      let refinementPrompt = `Refine #${refinementCount + 1}`;
+
+      if (settings) {
+        if (settings.refineType) refinementPrompt += ` Type: ${settings.refineType}`;
+        if (settings.length > 0) refinementPrompt += ` Length: ${settings.length}`;
+        if (settings.target) refinementPrompt += ` Target: ${settings.target}`;
+      }
+
+      startGenerating(refinementPrompt);
+
+      try {
+        const textToRefine = content.trim() || results[0]?.response || '';
+        const promptWithSettings = settings?.detail
+          ? `${textToRefine}\n\n세부 지시사항: ${settings.detail}`
+          : textToRefine;
+
+        const response = await generateText(promptWithSettings);
+        const newResult: PromptResult = {
+          id: Date.now().toString(),
+          prompt: refinementPrompt,
+          response,
+          timestamp: new Date(),
+          originalContent: textToRefine,
+        };
+
+        setResults((prev) => [newResult, ...prev]);
+        return refinementPrompt;
+      } catch (err) {
+        console.error('Text refinement failed:', err);
+        setError(err instanceof Error ? err.message : 'Text refinement failed. Please try again.');
+        return undefined;
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [generateText, results, content],
+  );
 
   return (
     <div className="w-full space-y-4">
-      <Tiptap />
+      <DynamicTipTap setContent={setContent} />
+      <SidePanel onRefine={refineText} setIsPanelActive={setIsPanelActive} />
 
-      <PromptController
-        isInputVisible={isInputVisible}
-        isGenerating={isGenerating}
-        onShowInput={showInput}
-        onHideInput={hideInput}
-        onSubmit={handlePromptSubmit}
-      />
+      {!isPanelActive && (
+        <PromptController
+          isInputVisible={isInputVisible}
+          isGenerating={isGenerating}
+          onShowInput={showInput}
+          onHideInput={hideInput}
+          onSubmit={handlePromptSubmit}
+        />
+      )}
 
       <PromptStatus isGenerating={isGenerating} currentPrompt={currentPrompt} error={error} />
-
       <PromptHistory results={results} />
     </div>
   );
