@@ -40,7 +40,7 @@ const RefinePanel = ({ handleBackToMainMenu, executeRefine, settings }: RefinePa
                 label={option.label}
                 onClick={() => selectOption(index)}
                 active
-                className="text-indigo-500 ignore-drag"
+                className="text-indigo-500"
               />
             ) : (
               <SliderDot onClick={() => selectOption(index)} />

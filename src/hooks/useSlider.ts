@@ -46,7 +46,7 @@ export function useSlider<T>({ sliderRef, options, initialValue, onChange, findI
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
-    if (target.closest('button') || target.closest('.ignore-drag')) return;
+    if (target.closest('.ignore-drag')) return;
     setIsDragging(true);
   }, []);
 

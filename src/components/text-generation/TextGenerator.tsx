@@ -25,7 +25,6 @@ export function TextGenerator() {
   const [isPanelActive, setIsPanelActive] = useState(false);
 
   const generateText = useCallback(async (prompt: string): Promise<string> => {
-    console.log('prompt', prompt);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return DUMMY_RESPONSES[Math.floor(Math.random() * DUMMY_RESPONSES.length)];
   }, []);
