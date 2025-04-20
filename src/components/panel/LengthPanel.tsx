@@ -40,7 +40,7 @@ const LengthPanel = ({ handleBackToMainMenu, executeRefine, settings }: LengthPa
                 label={`${option}자`}
                 active
                 onClick={() => selectOption(index)}
-                className="text-indigo-500"
+                className="text-indigo-500 ignore-drag"
               />
             ) : (
               <SliderDot onClick={() => selectOption(index)} />

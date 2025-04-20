@@ -14,7 +14,6 @@ interface UseSliderProps<T> {
  */
 export function useSlider<T>({ sliderRef, options, initialValue, onChange, findIndex }: UseSliderProps<T>) {
   const [isDragging, setIsDragging] = useState(false);
-
   const [activeIndex, setActiveIndex] = useState(() => {
     const index = findIndex ? findIndex(options, initialValue) : options.findIndex((opt) => opt === initialValue);
     return index >= 0 ? index : 0;
@@ -44,11 +43,17 @@ export function useSlider<T>({ sliderRef, options, initialValue, onChange, findI
     [onChange, options],
   );
 
-  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    if (target.closest('.ignore-drag')) return;
-    setIsDragging(true);
-  }, []);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.ignore-drag')) return;
+
+      setIsDragging(true);
+      updateIndexFromPosition(e.clientY);
+      e.preventDefault();
+    },
+    [updateIndexFromPosition],
+  );
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -67,16 +72,14 @@ export function useSlider<T>({ sliderRef, options, initialValue, onChange, findI
   }, [isDragging, activeIndex, selectOption]);
 
   useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
 
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
 
   return {
     isDragging,
