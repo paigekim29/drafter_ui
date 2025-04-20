@@ -28,8 +28,9 @@ const RefinePanel = ({ handleBackToMainMenu, executeRefine, settings }: RefinePa
     <div className="flex flex-col items-center gap-2">
       <div
         ref={sliderRef}
-        className="flex flex-col items-center space-y-4 p-2 rounded-full bg-slate-200 shadow-lg border relative"
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+        className={`flex flex-col items-center space-y-4 p-2 rounded-full bg-slate-200 shadow-lg border relative ${
+          isDragging ? 'cursor-grabbing' : 'cursor-grab'
+        }`}
         onMouseDownCapture={handleMouseDown}
       >
         {REFINE_OPTIONS.map((option, index) => (
